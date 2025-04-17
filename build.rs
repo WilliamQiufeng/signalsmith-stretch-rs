@@ -8,9 +8,18 @@ fn main() {
     println!("cargo::rerun-if-changed=src/wrapper.cpp");
     println!("cargo::rerun-if-changed=signalsmith-stretch/signalsmith-stretch.h");
 
+    // Run cmake command on the folder signalsmith-stretch
+    let path = cmake::Config::new("signalsmith-stretch")
+        .define("CMAKE_BUILD_TYPE", "Release")
+        .define("CMAKE_PROJECT_NAME", "SignalsmithStretch")
+        .define("CMAKE_MINIMUM_REQUIRED_VERSION", "3.15")
+        .build_target("all")
+        .build();
+
     cc::Build::new()
         .file(src_path.join("wrapper.cpp"))
         .include(Path::new("signalsmith-stretch"))
+        .include(path.join("build/_deps/signalsmith-linear-src/include"))
         .cpp(true)
         .compile("signalsmith-stretch");
 
